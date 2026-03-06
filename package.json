@@ -1,5 +1,10 @@
 {
+  "name": "antispambot",
+  "version": "1.0.0",
+  "description": "GroupMe bot for fighting spam in groups",
+  "main": "handler.py",
   "devDependencies": {
-    "serverless-python-requirements": "^6.0.0"
+    "serverless": "^3.38.0",
+    "serverless-python-requirements": "^5.4.0"
   }
 }
