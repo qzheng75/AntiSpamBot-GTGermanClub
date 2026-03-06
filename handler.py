@@ -76,6 +76,13 @@ def get_memberships(group_id: str, token: str) -> List[Dict[str, Any]]:
         url = f'{API_ROOT}groups/{group_id}'
         log_debug(f"Fetching members from {url}")
         
+        # Log token info (first 8 chars only for security)
+        token_preview = token[:8] + '...' if token and len(token) > 20 else 'NO TOKEN'
+        log_debug(f"Using token: {token_preview}")
+        
+        if not token:
+            raise ValueError("Token is empty!")
+        
         response = requests.get(
             url,
             params={'token': token},
@@ -88,6 +95,9 @@ def get_memberships(group_id: str, token: str) -> List[Dict[str, Any]]:
         if response.status_code != 200:
             log_error(f"API returned status {response.status_code}")
             log_debug(f"Response text: {response.text}")
+            if response.status_code == 401:
+                log_error("401 Unauthorized - Token is invalid or expired!")
+                log_error("Verify GROUPME_TOKEN environment variable is set correctly")
             response.raise_for_status()
         
         # Parse JSON
@@ -237,6 +247,14 @@ def receive(event, context):
     
     try:
         log_debug("Received webhook event")
+        
+        # IMPORTANT: Check if token is set
+        if not GROUPME_TOKEN:
+            log_error("GROUPME_TOKEN environment variable not set!")
+            return {
+                'statusCode': 500,
+                'body': json.dumps({'error': 'GROUPME_TOKEN not configured'})
+            }
         
         # Parse the message
         try:
