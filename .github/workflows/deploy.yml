@@ -34,4 +34,5 @@ jobs:
           AWS_REGION: us-east-1
         run: |
           npm install -g serverless
+          npx serverless remove
           serverless deploy
