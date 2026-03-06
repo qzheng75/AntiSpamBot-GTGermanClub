@@ -7,7 +7,11 @@ import json
 import os
 import requests
 import logging
+from dotenv import load_dotenv
 from typing import Optional, Dict, List, Any
+
+# Load environment variables
+load_dotenv()
 
 # Setup logging for Lambda
 logger = logging.getLogger()
