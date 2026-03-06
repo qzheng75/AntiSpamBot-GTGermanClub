@@ -109,3 +109,4 @@ venv.bak/
 # Custom
 vendor/
 node_modules/
+.vscode/
