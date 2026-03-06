@@ -8,6 +8,9 @@ import json
 
 
 API_ROOT = 'https://api.groupme.com/v3/'
+GROUPME_TOKEN = os.environ.get('GROUPME_TOKEN')
+GROUPME_BOT_ID = os.environ.get('GROUPME_BOT_ID')
+
 FLAGGED_PHRASES = (
     'the test phrase',
     'essay written by professionals',
@@ -65,18 +68,22 @@ def kick_user(group_id, user_id, token):
     return False
 
 
-
-
 def receive(event, context):
     message = json.loads(event['body'])
-    bot_id = message['bot_id']
+    
+    # Skip if message is from the bot itself
+    if message.get('sender_type') == 'bot':
+        return {
+            'statusCode': 200,
+            'body': 'ok'
+        }
 
     for phrase in FLAGGED_PHRASES:
         if phrase in message['text'].lower():
             # Attempt to kick the user and check if it was successful
-            if kick_user(message['group_id'], message['user_id'], message['token']):
-                delete_message(message['group_id'], message['id'], message['token'])
-                send('Kicked ' + message['name'] + ' due to apparent spam post.', bot_id)
+            if kick_user(message['group_id'], message['user_id'], GROUPME_TOKEN):
+                delete_message(message['group_id'], message['id'], GROUPME_TOKEN)
+                send('Kicked ' + message['name'] + ' due to apparent spam post.', GROUPME_BOT_ID)
             else:
                 print('Kick attempt failed or user is an admin.')
             break
